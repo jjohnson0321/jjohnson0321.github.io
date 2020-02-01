@@ -1,50 +1,62 @@
-// Gordon McCreary (January 2020)
+// Gordon McCreary (January 22, 2020)
 
-/**
- * The Animation class is designed to represent 1 animation. For example, you
- * should declare separate Animations for jumping, walking right, walking left,
- * etc. 
- */
+/*
+Animation
+
+The Animation class is designed to represent 1 animation. For example, you
+should declare seperate Animations for jumping, walking right, walking left,
+etc. 
+*/
 class Animation {
 
-    /**
-     * @param {Image} spriteSheet The sprite sheet Image that you wish to
-     *      animate, preferably a PNG.
-     * @param {number} frameWidth The width of an individual sprite in the
-     *      sprite sheet. Sprite sheets must have uniform width of sprites.
-     *      Throws an exception if the spriteSheet width is not an exact
-     *      multiple of frameWidth.
-     * @param {number} frameHeight The height of an individual sprite in the
-     *      sprite sheet. Sprite sheets must have uniform height of sprites.
-     *      Throws an exception if the spriteSheet height is not an exact
-     *      multiple of frameHeight.
-     * @param {object} firstFrame This parameter will determine which frame of
-     *      the sprite sheet your animation begins on. This requires that you
-     *      pass a point object formatted as follows:
-     *          {x: 0, y: 0}
-     *      This example will begin the animation at the top-left frame. As x
-     *      increases by 1 it will move 1 frame to the right. As y increases it
-     *      will move 1 frame down. Throws an exception if coordinates are out
-     *      of bounds.
-     * @param {object} lastFrame This parameter will determine which frame of
-     *      the sprite sheet your animation ends on (inclusive). This requires
-     *      that you pass a point object; see firstFrame documentation for
-     *      formatting. The frames are in row-major order, so if lastFrame
-     *      follows firstFrame they will animate in that sequence. If lastFrame
-     *      comes before firstFrame then the animation will play from
-     *      firstFrame until the final frame of the sprite sheet, then from the
-     *      initial frame of the sprite sheet until lastFrame. If lastFrame has
-     *      the same coordinates as firstFrame, a still image will be drawn.
-     *      Throws an exception if coordinates are out of bounds.
-     * @param {number} fps The frame rate that you would like your animation to
-     *      play at. A frame rate of 0 will produce a still image. A negative
-     *      fps means that the animation will play in reverse at the absolute
-     *      value of the frame rate.
-     * @param {*} loop Pass true if you would like the animation to loop.
-     * @param {*} scale The scaling ratio that you would like your animation to
-     *      be drawn with. Throws an exception if scale isn't positive.
-     */
+    /*
+    spriteSheet:
+    The sprite sheet Image that you wish to animate, preferably a PNG.
+
+    frameWidth:
+    The width of an individual sprite in the sprite sheet. Sprite sheets must
+    have uniform width of sprites. Throws an exception if the spriteSheet width
+    is not an exact multiple of frameWidth.
+
+    frameHeight:
+    The height of an individual sprite in the sprite sheet. Sprite sheets must
+    have uniform height of sprites. Throws an exception if the spriteSheet
+    height is not an exact multiple of frameHeight.
+
+    firstFrame:
+    This parameter will determine which frame of the sprite sheet your
+    animation begins on. This requires that you pass a point object formatted
+    as follows:
+        {x: 0, y: 0}
+    This example will begin the animation at the top-left frame. As x increases
+    by 1 it will move 1 frame to the right. As y increases it will move 1 frame
+    down. Throws an exception if coordinates are out of bounds.
+
+    lastFrame:
+    This parameter will determine which frame of the sprite sheet your
+    animation ends on (inclusive). This requires that you pass a point object;
+    see firstFrame documentation for formatting. The frames are in row-major
+    order, so if lastFrame follows firstFrame they will animate in that
+    sequence. If lastFrame comes before firstFrame then the animation will
+    play from firstFrame until the final frame of the sprite sheet, then from
+    the initial frame of the sprite sheet until lastFrame. If lastFrame has the
+    same coordinates as firstFrame, a still image will be drawn. Throws an
+    exception if coordinates are out of bounds.
+
+    fps:
+    The frame rate that you would like your animation to play at. A frame rate
+    of 0 will produce a still image. A negative fps means that the animation
+    will play in reverse at the absolute value of the frame rate.
+
+    loop:
+    Pass true if you would like the animation to loop.
+
+    scale:
+    The scaling ratio that you would like your animation to be drawn with.
+    Throws an exception if scale isn't positive.
+    */
     constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale) {
+
         // Check width.
         let i = 0;
         while (i < spriteSheet.width) {
@@ -76,15 +88,14 @@ class Animation {
         || lastFrame.y < 0
         || lastFrame.x >= spriteSheet.width / frameWidth
         || lastFrame.y >= spriteSheet.height / frameHeight) {
-            throw "Parameter lastFrame out of bounds!" + spriteSheet.src + "(" + lastFrame.x + "," + lastFrame.y + ")";
+            throw "Parameter lastFrame out of bounds!";
         }
 
         // Check scale.
-        if (scale <= 0) {
-            throw "Scale must be positive!";
-        }
-        
-        // Assign fields.
+        //if (scale <= 0) {
+        //    throw "Scale must be positive!";
+        //}
+
         this._spriteSheet = spriteSheet;
         this._frameWidth = frameWidth;
         this._frameHeight = frameHeight;
@@ -93,8 +104,7 @@ class Animation {
         this._firstFrame = firstFrame;
         this._lastFrame = lastFrame;
         this._frameDuration = Infinity;
-		this._setFrame = 0;
-		this._paused = false;
+		this._setFrame = firstFrame;
         if (fps !== 0) {
             this._frameDuration = (1 / Math.abs(fps));
         }
@@ -118,19 +128,26 @@ class Animation {
         this._totalTime = this._frameDuration * this._totalFrames;
     }
 
-    /**
-     * Draws the sprite to the canvas.
-     * @param {*} tick The game's clock tick.
-     * @param {*} ctx The canvas' 2D context.
-     * @param {*} posX The x pixel coordinate that you want the sprite to be
-     *      drawn on the canvas.
-     * @param {*} posY The y pixel coordinate that you want the sprite to be
-     *      drawn on the canvas.
-     * @param {*} center Pass true if you'd like the sprite to be drawn
-     *      centered on the posX & posY coordinates.
-     */
-    drawFrame(tick, ctx, posX, posY, center) {
 
+    /*
+    tick:
+    The game's clock tick.
+
+    ctw:
+    The canvas' 2D context.
+
+    posX:
+    The x pixel coordinate that you want the sprite to be drawn on the canvas.
+
+    posY:
+    The y pixel coordinate that you want the sprite to be drawn on the canvas.
+
+    center:
+    Pass true if you'd like the sprite to be drawn centered on the posX & posY
+    coordinates.
+    */
+    drawFrame(tick, ctx, posX, posY, center) {
+		this.center = center;
         let that = this;
         let drawX = posX;
         let drawY = posY;
@@ -138,44 +155,36 @@ class Animation {
             drawX -= ((that._frameWidth * that._scale) / 2);
             drawY -= ((that._frameHeight * that._scale) / 2);
         }
-		this._center = center;
 
-        // Check if still image.
+        //Check if still image.
         let cF;
-		if(this._paused !== true && this._paused !== false)
-		{
-			console.log(this._paused);
-		}
-		cF = this.currentFrame();
-         
+        if (this._frameDuration === Infinity) {
+            cF = this.currentFrame();
+        } else {
+            cF = this.currentFrame();
+        }  
 
-        // Draw image.
         ctx.drawImage(this._spriteSheet,
             cF.x * this._frameWidth, cF.y * this._frameHeight,  // Sprite's top-left position on sprite sheet.
             this._frameWidth, this._frameHeight, // Size of source sprite.
             drawX, drawY, // Position to draw sprite on the canvas.
             this._frameWidth * this._scale, this._frameHeight * this._scale); // Size to draw sprite on canvas.
-        
-        // Update time.
+
         this._elapsedTime += tick;
         if (this.isDone()) {
             if (that._loop === true) that._elapsedTime = 0;
         }
     }
 
-    /**
-    * @return {object} Returns the current frame in a point object formatted as {x: 0, y: 0}.
+    /*
+    Returns the current frame in a point object formatted as {x: 0, y: 0}.
     */
     currentFrame() {
         let frameNum = Math.floor(this._elapsedTime / this._frameDuration);
-		if(this._frameDuration === Infinity || this._paused === true)
+		if(this._frameDuration === Infinity)
 		{
 			//console.log("Test");
 			frameNum = this._setFrame;
-		}
-		else
-		{
-			this._setFrame = frameNum;
 		}
 
         // Calculate row major index of current frame.
@@ -184,13 +193,13 @@ class Animation {
         let rmCF;
         if (this._firstFrame.y < this._lastFrame.y
         || (this._firstFrame.y === this._lastFrame.y && this._firstFrame.x <= this._lastFrame.x)) {
-            if (this._reverse) {
+            if (this._reverse === true) {
                 rmCF = rmLF - frameNum;
             } else {
                 rmCF = rmFF + frameNum;
             }
         } else {
-            if (this._reverse) {
+            if (this._reverse === true) {
                 rmCF = rmLF - frameNum;
                 if (rmCF < 0) {
                     rmCF = ((this._sheetWidth * this._sheetHeight) - rmCF);
@@ -210,13 +219,25 @@ class Animation {
         return {x: x, y: y};
     }
 
+	//NEW
 	getFrame()
 	{
 		let frameNum = Math.floor(this._elapsedTime / this._frameDuration);
 		return frameNum;
-    }
-    
-	// setFrame only matters if the animation is paused.
+	}
+	
+	getCenter(posX, posY)
+	{
+		if(this.center === true)
+		{
+			return {x: posX, y: posY}; 
+		}
+		else
+		{
+			return {x: posX + this._frameWidth * this._scale/2, y: posY + this._frameHeight * this._scale/2}; 
+		}
+	}
+	
 	nextFrame()
 	{
 		this._setFrame += 1;
@@ -226,37 +247,11 @@ class Animation {
 	{
 		this._setFrame = theFrame;
 	}
-	
-	pause()
-	{
-		this._paused = true;
-	}
-	
-	unpause()
-	{
-		this._paused = false;
-	}
 
-    /**
-     * @return {boolean} Returns true if the animation is done, false otherwise.
-     */
+    /*
+    Returns true if the animation is done, false otherwise.
+    */
     isDone () {
         return (this._elapsedTime >= this._totalTime);
-    }
-
-    /**
-     * Resets the animation to 0.
-     */
-    resetAnimation() {
-        this._elapsedTime = 0;
-		this._setFrame = 0;
-    }
-    
-    getLastFrameAsInt()
-    {
-      let first = this._firstFrame.y * this._sheetWidth + this._firstFrame.x;
-      let last = this._lastFrame.y * this._sheetWidth + this._lastFrame.x;
-      return last - first;
-      
     }
 }

@@ -1,89 +1,84 @@
-/*
-Timer
-
-The timer class is used to track the duration of certain functions.
-Used for animations and timing
-*/
-class Timer
+function Timer(game, time, looping)
 {
-	constructor(game, time, looping) {
-		this.game = game;
-		this.end = time;
-		this.elapsed = 0.0;
-		this.looping = looping;
-		this.removeFromWorld = false;
-		this.paused = false;
-		this.callback = null;
-		
-		this.game.addTimer(this);
-	}
+	this.game = game;
+	this.end = time;
+	this.elapsed = 0.0;
+	this.looping = looping;
+	this.done = false;
+	this.paused = false;
+}
 
-	update()
+Timer.prototype.update = function (dt)
+{
+	if(this.paused === false)
 	{
-		if (!this.paused) {
-			//console.log("Timer" + this.id + " Working: " + this.elapsed + " != " + this.end);
-			this.elapsed += this.game._clockTick;
-			if (this.elapsed >= this.end) {
-				if (this.looping === true) {
-					this.elapsed -= this.end;
-				} else {
-					this.destroy();
-				}
+		console.log("Timer" + this.id + " Working: " + this.elapsed + " != " + this.end);
+		this.elapsed += dt;
+		if(this.elapsed >= this.end)
+		{
+			if(this.looping === true)
+			{
+				this.elapsed -= this.end;
+			}
+			else
+			{
+				this.destroy();
 			}
 		}
 	}
-
-	getTime() 
-	{
-		return this.elapsed;
-	}
-
-	getPercent() 
-	{
-		return this.elapsed / this.end;
-	}
-
-	destroy()
-	{
-		this.removeFromWorld = true;
-	}
-
-	pause() 
-	{
-		this.paused = true;
-	}
-
-	unpause() 
-	{
-		this.paused = false;
-	}
-
-	reset()
-	{
-		this.elapsed = 0;
-	}
 }
 
-class TimerCallBack extends Timer
+Timer.prototype.getTime = function ()
 {
-	constructor(game, time, looping, fn)
-	{
-		super(game, time, looping);
+	return this.elapsed;
+}
 
-		this.callback = fn;
-	}
+Timer.prototype.getPercent = function ()
+{
+	return this.elapsed / this.end;
+}
 
-	update()
+Timer.prototype.destroy = function ()
+{
+	console.log("I DIE NOW!");
+	this.done = true;
+}
+
+Timer.prototype.pause = function ()
+{
+	this.paused = true;
+}
+
+Timer.prototype.unpause = function ()
+{
+	this.paused = false;
+}
+
+function TimerCallBack(game, time, looping, fn)
+{
+	Timer.call(this, game, time, looping);
+	
+	this.callback = fn;
+}
+
+TimerCallBack.prototype = new Timer();
+TimerCallBack.prototype.constructor = TimerCallBack;
+
+TimerCallBack.prototype.update = function (dt)
+{
+	if(this.paused === false)
 	{
-		if (!this.paused) {
-			this.elapsed += this.game._clockTick;
-			if (this.elapsed >= this.end) {
-				this.callback();
-				if (this.looping) {
-					this.elapsed -= this.end;
-				} else {
-					this.destroy();
-				}
+		this.elapsed += dt;
+		if(this.elapsed >= this.end)
+		{
+			this.callback();
+			if(this.looping === true)
+			{
+				this.elapsed -= this.end;
+			}
+			else
+			{
+				this.destroy();
 			}
 		}
 	}

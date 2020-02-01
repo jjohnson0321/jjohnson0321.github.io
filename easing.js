@@ -1,5 +1,3 @@
-// functions from the fast and funky 1d transformations gdc talk.
-
 function smoothStartN(t, n)
 {
 	return Math.pow(t, n);

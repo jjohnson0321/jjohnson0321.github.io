@@ -1,266 +1,3 @@
-const DIRECTION_LEFT = "LEFT";
-const DIRECTION_RIGHT = "RIGHT";
-const DIRECTION_UP = "UP";
-const DIRECTION_DOWN = "DOWN";
-
-const GAME_STATES = {
-    CHARACTER_SELECT: "char_select",
-    PLAYING: "playing_level",
-    CHANGING_LEVEL: "changing level"
-};
-
-const LAYERS = {
-    FLOOR: 0,
-    WALL: 1,
-    PICKUPS: 2,
-    PROJECTILES: 3,
-    PCS: 4,
-    HUD: 5
-};
-/**
- * The GameEngine class is the heart our game. It maintains the render-update
- * loop and provides all entities with the resources they need to exist and
- * interact.
- */
-class GameEngine {
-
-    /**
-     * @param {Camera} camera The camera that's attached to the main character.
-     * @param {Level} level The level being played by the main character.
-     * @param {characterChooser} The chooser that we are using to pick a character.
-     */
-    constructor(camera, level) {
-        this._camera = camera;
-        this._level = level;
-        this._entities = [];
-        this._entities[0] = []; // Floor & Wall
-        this._entities[1] = []; // Enemies
-        this._entities[2] = []; // Pickups & Projectiles
-        this._entities[3] = []; // Playable Characters
-        this._entities[4] = []; // HUD
-        this._ctx = null;
-		
-		this.timers = [];
-		this.click = false;
-		this.score = 0;
-		this.chars = [];
-		this.keyStack = [];
-		this.lastChar = null;
-
-		this.game_state = GAME_STATES.CHARACTER_SELECT;
-    }
-
-    /**
-     * Initializes the game.
-     * @param {*} ctx The HTML canvas' 2D context.
-     */
-    init(ctx) {
-        this._ctx = ctx;
-        this._surfaceWidth = this._ctx.canvas.width;
-        this._surfaceHeight = this._ctx.canvas.height;
-        this.startInput();
-        this._clock = new Clock();
-    }
-
-    /**
-     * Starts the render-update loop.
-     */
-    start() {
-        let that = this;
-        (function gameLoop() {
-            that.loop();
-            requestAnimFrame(gameLoop, that._ctx.canvas);
-        })();
-    }
-
-    /**
-    * Initializes all event listeners for user input.
-    */
-    startInput = Input; 
-
-    /**
-     * Adds the given entity to the list of entities in the requested layer.
-     * @param {*} entity The entity to be added.
-     * @param {number | string} layer The entity destination layer.
-     *      Pass 0 or "floor" for layer 0 (floor & wall tiles);
-     *      Pass 1 or "enemy" for layer 1 (enemies);
-     *      Pass 2 or "pps" for layer 2 (projectiles and pickups);
-     *      Pass 3 or "main" for layer 3 (playable characters);
-     *      Pass 4 or "hud" for layer 4 (HUD);
-     */
-    addEntity(entity, layer) {
-		entity.layer = layer;
-		let choice = -1; // if an entity is added without a proper layer this will throw an error.
-        if (typeof(layer) === "string") {
-            if ("floor" === layer) {
-				choice = 0;
-            } else if ("enemy" === layer) {
-				choice = 1;
-            } else if ("pps" === layer) {
-				choice = 2;
-            } else if ("main" === layer) {
-				choice = 3;
-            } else if ("hud" === layer) {
-				choice = 4;
-            } else {
-                throw "Invalid layer string parameter.";
-            }
-			
-			entity.id = this._entities[choice].length;
-			this._entities[choice].push(entity);
-
-			
-        } else if (typeof(layer) === "number") {
-            if (layer === Math.floor(layer) && layer >= 0 && layer < 5) {
-                this._entities[layer].push(entity);
-            } else {
-                throw "Invalid layer number parameter.";
-            }
-        } else {
-            throw "Incorrect layer parameter type.";
-        }
-		
-		//console.log("CREATED ENTITY");
-    }
-	
-	removeEntity (entity, layer) {
-		this.entities[layer][entity.id] = this.entities[layer][this.entities[layer].length-1];
-		this.entities[layer][entity.id].id = entity.id;
-		this.entities[layer][this.entities[layer].length-1] = entity;
-		this.entities[layer].pop();
-	}
-	
-	addTimer(timer) {
-		timer.id = this.timers.length;
-		this.timers.push(timer);
-	}
-	
-	removeTimer(timer) {
-		this.timers[timer.id] = this.timers[this.timers.length-1];
-		this.timers[timer.id].id = timer.id;
-		this.timers[this.timers.length-1] = timer;
-		this.timers.pop();
-	}
-
-	setPlayer(player) {
-		this.player = player;
-	}
-
-	setAssetManager(manager) {
-		this.AM = manager;
-	}
-	
-
-    /**
-    * Calls draw() on every entity in memory.
-    */
-    draw() {
-        this._ctx.clearRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
-        this._ctx.save();
-        for (let i = 0; i < this._entities.length; i++) {
-            for (let j = 0; j < this._entities[i].length; j++) {
-                this._entities[i][j].draw(this._ctx);
-            }
-        }
-		
-        this._ctx.restore();
-    }
-
-    /**
-     * Calls update() on every entity while disposing of entities that aren't
-     * needed anymore.
-     */
-    update() {
-
-        switch (this.game_state) {
-            case GAME_STATES.CHARACTER_SELECT:
-                var i = 0;
-                for(i = 0; i < this._entities[0].length; i++)
-                {
-                    if(this.entities[0][i].removeFromWorld)
-                    {
-                        this.removeEntity(this.entities[0][i], 0);
-                        continue;
-                    }
-                    this.entities[0][i].update();
-                }
-                for (i = 0; i < this.entities[3].length; i++) {
-                    if(this.entities[3][i].removeFromWorld)
-                    {
-                        this.removeEntity(this.entities[3][i], 3);
-                        continue;
-                    }
-                    this.entities[3][i].update();
-                }
-                for(i = 0; i < this._entities[4].length; i++)
-                {
-                    if(this.entities[4][i].removeFromWorld)
-                    {
-                        this.removeEntity(this.entities[4][i], 4);
-                        continue;
-                    }
-                    this.entities[4][i].update();
-                }
-                this.click = false;
-
-                break;
-            case GAME_STATES.PLAYING:
-                for (var i = 0; i < this._entities.length; i++) {
-                    let entityCount = this._entities[i].length;
-                    for(var j = 0; j < entityCount; j++)
-                    {
-                        if(this.entities[i][j].removeFromWorld)
-                        {
-                            this.removeEntity(this.entities[i][j], i);
-                            entityCount = this.entities[i].length;
-                            j--;
-                            continue;
-                        }
-
-                        this.entities[i][j].update();
-                    }
-                }
-
-                var timersCount = this.timers.length;
-
-                for (var i = 0; i < timersCount; i++)
-                {
-                    let tim = this.timers[i];
-                    if(tim.removeFromWorld)
-                    {
-                        this.removeTimer(tim);
-                        timersCount = this.timers.length;
-                        i--;
-                        continue;
-                    }
-                    this.timers[i].update();
-                }
-
-                break;
-        }
-
-        // Clear input
-        this._clicks = [];
-
-    }
-
-    /**
-    * Loops while calling update() and draw().
-    */
-    loop() {
-        this._clockTick = this._clock.tick();
-        this.update();
-        this.draw();
-    }
-
-    // Getters and setters.
-    get camera() {return this._camera;}
-    get level() {return this._level;}
-    get entities() {return this._entities;}
-    get ctx() {return this._ctx;}
-}
-
-// Used in start() to cap framerate.
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -271,3 +8,293 @@ window.requestAnimFrame = (function () {
                 window.setTimeout(callback, 1000 / 60);
             };
 })();
+
+function GameEngine() {
+    this.entities = [];
+	this.timers = []; // new
+    this.ctx = null;
+    this.surfaceWidth = null;
+    this.surfaceHeight = null;
+	this.set = false;
+	this.score = 0;
+}
+
+GameEngine.prototype.init = function (ctx) {
+    this.ctx = ctx;
+    this.surfaceWidth = this.ctx.canvas.width;
+    this.surfaceHeight = this.ctx.canvas.height;
+    this.clock = new Clock(); // new
+
+}
+
+GameEngine.prototype.start = function () {
+
+    var that = this;
+    (function gameLoop() {
+        that.loop();
+        requestAnimFrame(gameLoop, that.ctx.canvas);
+    })();
+}
+
+GameEngine.prototype.startInput = function () {
+
+
+    var getXandY = function (e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+
+        if (x < 1024) {
+            x = Math.floor(x / 32);
+            y = Math.floor(y / 32);
+        }
+
+        return { x: x, y: y };
+    }
+
+    var that = this;
+
+    // event listeners are added here
+	
+	var x = 1;
+	
+	this.ctx.canvas.x = 3;
+	
+    this.ctx.canvas.addEventListener("mousedown", function (e) {
+		var x = 2;
+
+        that.click = getXandY(e);
+        that.clicking = true;
+		that.reticle.animation.setFrame(1);
+    }, false);
+	
+	this.ctx.canvas.addEventListener("mouseup", function (e) {
+		that.clicking = false;
+		that.reticle.animation.setFrame(0);
+    }, false);
+
+    this.ctx.canvas.addEventListener("contextmenu", function (e) {
+        that.click = getXandY(e);
+
+        e.preventDefault();
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+		
+
+		var element = that.ctx.canvas, offsetX = 0, offsetY = 0, mx, my;
+
+		// Compute the total offset
+		if (element.offsetParent !== undefined) {
+
+				offsetX += element.offsetLeft;
+				offsetY += element.offsetTop;
+
+		}
+
+		mx = e.pageX - offsetX;
+		my = e.pageY - offsetY;
+
+		
+        that.mouseX = mx;
+		that.mouseY = my;
+
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousewheel", function (e) {
+
+        that.wheel = e;
+
+    }, false);
+
+    this.ctx.canvas.addEventListener("keydown", function (e) {
+        console.log(e);
+        console.log("Key Down Event - Char " + e.code + " Code " + e.keyCode);
+    }, false);
+
+    this.ctx.canvas.addEventListener("keypress", function (e) {
+        if (e.code === "KeyD") that.d = true;
+        that.chars[e.code] = true;
+        console.log(e);
+        console.log("Key Pressed Event - Char " + e.charCode + " Code " + e.keyCode);
+    }, false);
+
+    this.ctx.canvas.addEventListener("keyup", function (e) {
+        console.log(e);
+        console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
+    }, false);
+
+    console.log('Input started');
+}
+
+GameEngine.prototype.addEntity = function (entity) {
+	entity.id = this.entities.length; // new
+    this.entities.push(entity);
+}
+
+//new
+GameEngine.prototype.removeEntity = function (entity) {
+    this.entities[entity.id] = this.entities[this.entities.length-1];
+	this.entities[entity.id].id = entity.id;
+	this.entities[this.entities.length-1] = entity;
+	this.entities.pop();
+}
+
+GameEngine.prototype.draw = function () {
+    this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
+    this.ctx.save();
+    for (var i = 0; i < this.entities.length; i++) {
+        this.entities[i].draw(this.ctx);
+    }
+	
+	if(this.set === true)
+	{
+		this.reticle.draw(this.ctx);
+	}
+	
+	this.ctx.font = "20px Georgia";
+	this.ctx.fillText("SCORE: " + this.score, 10, 25);
+	
+    this.ctx.restore();
+	
+}
+
+GameEngine.prototype.update = function () {
+    var entitiesCount = this.entities.length;
+
+    for (var i = 0; i < entitiesCount; i++) {
+        var entity = this.entities[i];
+
+        entity.update();
+		if(this.clicking === true)
+		{
+			let scale = entity.animation._scale;
+			if(scale < 1)
+			{
+				scale = 1;
+			}
+			let ctr = entity.animation.getCenter(entity.x, entity.y);
+			if(circleToCircle({x: ctr.x, y: ctr.y, radius: entity.animation._scale * 6}, {x: this.mouseX, y: this.mouseY, radius: 25}) === true)
+			{
+				entity.destroy();
+				this.score += 100;
+			}
+		}
+		if(entity.done)
+		{
+			this.removeEntity(entity);
+			entitiesCount = this.timers.length;
+			i--;
+			continue;
+		}
+    }
+	
+	//new
+	var timersCount = this.timers.length;
+	
+	for (var i = 0; i < timersCount; i++)
+	{
+		let tim = this.timers[i];
+		if(tim.done)
+		{
+			this.removeTimer(tim);
+			timersCount = this.timers.length;
+			i--;
+			continue;
+		}
+		this.timers[i].update(this.clockTick);
+	}
+	if(this.set === true)
+	{
+		this.reticle.update(this.mouseX, this.mouseY);
+	}
+}
+
+GameEngine.prototype.loop = function () {
+    this.clockTick = this.clock.tick(); // new
+    this.update();
+    this.draw();
+}
+
+//new
+GameEngine.prototype.addTimer = function (timer) {
+	timer.id = this.timers.length; // new
+    this.timers.push(timer);
+	//console.log("add: " + this.timers.length);
+}
+
+//new
+GameEngine.prototype.setReticle = function (reticle) {
+	//console.log("This");
+	this.reticle = reticle;
+	this.set = true;
+}
+
+//new
+GameEngine.prototype.removeTimer = function (timer) {
+    this.timers[timer.id] = this.timers[this.timers.length-1];
+	this.timers[timer.id].id = timer.id;
+	this.timers[this.timers.length-1] = timer;
+	this.timers.pop();
+	//console.log("remove: " + this.timers.length);
+}
+
+
+// Renamed Timer as Clock function;
+function Clock() {
+    this.gameTime = 0;
+    this.maxStep = 0.05;
+    this.wallLastTimestamp = 0;
+}
+
+Clock.prototype.tick = function () {
+    var wallCurrent = Date.now();
+    var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
+    this.wallLastTimestamp = wallCurrent;
+
+    var gameDelta = Math.min(wallDelta, this.maxStep);
+    this.gameTime += gameDelta;
+    return gameDelta;
+}
+
+function Entity(game, x, y) {
+    this.game = game;
+    this.x = x;
+    this.y = y;
+	this.id = 0; // new
+    this.removeFromWorld = false;
+}
+
+Entity.prototype.destroy = function() {
+	this.done = true;
+}
+
+Entity.prototype.update = function () {
+	//console.log("hello");
+}
+
+Entity.prototype.draw = function (ctx) {
+    if (this.game.showOutlines && this.radius) {
+        this.game.ctx.beginPath();
+        this.game.ctx.strokeStyle = "green";
+        this.game.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        this.game.ctx.stroke();
+        this.game.ctx.closePath();
+    }
+}
+
+Entity.prototype.rotateAndCache = function (image, angle) {
+    var offscreenCanvas = document.createElement('canvas');
+    var size = Math.max(image.width, image.height);
+    offscreenCanvas.width = size;
+    offscreenCanvas.height = size;
+    var offscreenCtx = offscreenCanvas.getContext('2d');
+    offscreenCtx.save();
+    offscreenCtx.translate(size / 2, size / 2);
+    offscreenCtx.rotate(angle);
+    offscreenCtx.translate(0, 0);
+    offscreenCtx.drawImage(image, -(image.width / 2), -(image.height / 2));
+    offscreenCtx.restore();
+    //offscreenCtx.strokeStyle = "red";
+    //offscreenCtx.strokeRect(0,0,size,size);
+    return offscreenCanvas;
+}
