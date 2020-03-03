@@ -1,0 +1,158 @@
+body {
+    background: url(../menuImages/menubackground.png) repeat 0 0;
+    background-size: 400vh 100vh;
+    height: 100%;
+    width: 100%;
+    animation: slide 25s linear infinite;
+    -webkit-animation: slide 25s linear infinite;
+}
+
+button {
+    margin: 0;
+    border: 0;
+    width: 24vw;
+    height: 8vw;
+}
+
+
+#logo {
+    width: 35%;
+    position: absolute;
+    top: 50%;
+    left: 75%;
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+#buttons {
+    list-style-type: none;
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+#story {
+    background: url(../menuImages/story.png);
+}
+
+#story:hover {
+    background: url(../menuImages/storyhover.png);
+}
+
+#story:active {
+    background: url(../menuImages/storypress.png);
+}
+
+#endless {
+    background: url(../menuImages/endless.png);
+}
+
+#endless:hover {
+    background: url(../menuImages/endlesshover.png);
+}
+
+#endless:active {
+    background: url(../menuImages/endlesspress.png);
+}
+
+#controls {
+    background: url(../menuImages/controls.png);
+}
+
+#controls:hover {
+    background: url(../menuImages/controlshover.png);
+}
+
+#controls:active {
+    background: url(../menuImages/controlspress.png);
+}
+
+#settings {
+    background: url(../menuImages/settings.png);
+}
+
+#settings:hover {
+    background: url(../menuImages/settingshover.png);
+}
+
+#settings:active {
+    background: url(../menuImages/settingspress.png);
+}
+
+#credits {
+    background: url(../menuImages/credits.png);
+}
+
+#credits:hover {
+    background: url(../menuImages/creditshover.png);
+}
+
+#credits:active {
+    background: url(../menuImages/creditspress.png);
+}
+
+#story, #endless, #controls, #settings, #credits,
+#story:hover, #endless:hover, #controls:hover, #settings:hover, #credits:hover,
+#story:active, #endless:active, #controls:active, #settings:active, #credits:active {
+    background-size: contain;
+}
+
+*:focus {
+    outline: none;
+}
+
+* {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+  
+@keyframes slide {
+    from { background-position: 0 0; }
+    to { background-position: -400vh 0; }
+}
+
+@-webkit-keyframes slide {
+    from { background-position: 0 0; }
+    to { background-position: -400vh 0; }
+}
+
+@media only screen and (orientation: portrait) {
+    #logo {
+        width: 50%;
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+    }
+
+    button {
+        margin: 0;
+        border: 0;
+        width: 24vh;
+        height: 8vh;
+    }
+
+    #buttons {
+        top: 65%;
+        left: 50%;
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+    }
+}
