@@ -1,5 +1,7 @@
 // Gordon McCreary (January 2020)
 
+const STANDARD_COLOR = {r: 0, g: 0, b: 0};
+
 /**
  * The Animation class is designed to represent 1 animation. For example, you
  * should declare separate Animations for jumping, walking right, walking left,
@@ -44,7 +46,7 @@ class Animation {
      * @param {*} scale The scaling ratio that you would like your animation to
      *      be drawn with. Throws an exception if scale isn't positive.
      */
-    constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale, addScale = 1, color = {r: 0, g: = 0, b: = 0) {
+    constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale, addScale = 1, color = {r: 0, g: 0, b: 0) {
         // Check width.
         let i = 0;
         while (i < spriteSheet.width) {
@@ -174,6 +176,8 @@ class Animation {
           console.log(myImg);
           for (var t=0; t < myImg.data.length; t+=4) {
              console.log(myImg.data[t]);
+             console.log(myImg.data[t+1]);
+             console.log(myImg.data[t+2]);
              myImg.data[t]=   this.color.r | myImg.data[t];
              myImg.data[t+1]= this.color.g | myImg.data[t+1];
              myImg.data[t+2]= this.color.b | myImg.data[t+2];
