@@ -178,9 +178,9 @@ class Animation {
              console.log(myImg.data[t]);
              console.log(myImg.data[t+1]);
              console.log(myImg.data[t+2]);
-             myImg.data[t]=   this.color.r | myImg.data[t];
-             myImg.data[t+1]= this.color.g | myImg.data[t+1];
-             myImg.data[t+2]= this.color.b | myImg.data[t+2];
+             myImg.data[t]=   this._color.r | myImg.data[t];
+             myImg.data[t+1]= this._color.g | myImg.data[t+1];
+             myImg.data[t+2]= this._color.b | myImg.data[t+2];
           }
           ctx.putImageData(myImg, 0, 0); // Image data is adjusted according to context    
         
