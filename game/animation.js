@@ -175,9 +175,6 @@ class Animation {
           var myImg = ctx.getImageData(drawX, drawY, this._width * this._scale, this._height * this._scale);
           console.log(myImg);
           for (var t=0; t < myImg.data.length; t+=4) {
-             console.log(myImg.data[t]);
-             console.log(myImg.data[t+1]);
-             console.log(myImg.data[t+2]);
              myImg.data[t]=   this._color.r | myImg.data[t];
              myImg.data[t+1]= this._color.g | myImg.data[t+1];
              myImg.data[t+2]= this._color.b | myImg.data[t+2];
