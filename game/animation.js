@@ -171,7 +171,7 @@ class Animation {
         drawX, drawY, // Position to draw sprite on the canvas.
         this._width * this._scale, this._height * this._scale); // Size to draw sprite on canvas.
     
-    var myImg = ctx.getImageData(drawX, drawY, 100, 100);
+    var myImg = ctx.getImageData(100, 100, 100, 100);
     //var myImg = ctx.getImageData(drawX, drawY, this._width * this._scale, this._height * this._scale);
     for (var t=0; t < myImg.data.length; t+=4) {
        myImg.data[t]=   this._color.r | myImg.data[t];
