@@ -83,7 +83,7 @@ class Player extends Entity {
             } else {
                 this.animation._screen = false;
             }
-            this.animation._color.r = 1;
+            this.animation._color = {r: 1, g: 0, b: 0};
             this.animation.drawFrame(this.game._clockTick, this.game._ctx, screenPos.x, screenPos.y, true, this.addScale);
         }
     }
