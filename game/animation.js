@@ -176,8 +176,8 @@ class Animation {
     var myImg = ctx.getImageData(100, 100, 100, 100);
     //var myImg = ctx.getImageData(drawX, drawY, this._width * this._scale, this._height * this._scale);
     for (var t=0; t < myImg.data.length; t+=4) {
-       myImg.data[t]=   0;
-       myImg.data[t+1]= 0;
+       myImg.data[t]=   1;
+       myImg.data[t+1]= 1;
        myImg.data[t+2]= 0;
     }
     ctx.putImageData(myImg, 100, 100); // Image data is adjusted according to context    
