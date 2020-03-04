@@ -46,7 +46,7 @@ class Animation {
      * @param {*} scale The scaling ratio that you would like your animation to
      *      be drawn with. Throws an exception if scale isn't positive.
      */
-    constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale, addScale = 1, color = {r: 0, g: 0, b: 0}) {
+    constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale, addScale = 1, color = {r: 1, g: 0, b: 0}) {
         // Check width.
         let i = 0;
         while (i < spriteSheet.width) {
@@ -173,7 +173,6 @@ class Animation {
         
           var myImg = ctx.getImageData(0, 0, 100, 100);
           //var myImg = ctx.getImageData(drawX, drawY, this._width * this._scale, this._height * this._scale);
-          console.log(myImg);
           for (var t=0; t < myImg.data.length; t+=4) {
              myImg.data[t]=   this._color.r | myImg.data[t];
              myImg.data[t+1]= this._color.g | myImg.data[t+1];
