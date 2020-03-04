@@ -46,7 +46,7 @@ class Animation {
      * @param {*} scale The scaling ratio that you would like your animation to
      *      be drawn with. Throws an exception if scale isn't positive.
      */
-    constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale, addScale = 1, color = {r: 1, g: 0, b: 0}) {
+    constructor(spriteSheet, frameWidth, frameHeight, firstFrame, lastFrame, fps, loop, scale, addScale = 1, color = {r: 0, g: 0, b: 0}) {
         // Check width.
         let i = 0;
         while (i < spriteSheet.width) {
