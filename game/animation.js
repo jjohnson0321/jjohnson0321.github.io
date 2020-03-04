@@ -164,21 +164,21 @@ class Animation {
 			ctx.globalCompositeOperation = "source-over";//color filter
 		}
 
-        // Draw image.
-        ctx.drawImage(this._spriteSheet,
-            cF.x * this._frameWidth, cF.y * this._frameHeight,  // Sprite's top-left position on sprite sheet.
-            this._frameWidth, this._frameHeight, // Size of source sprite.
-            drawX, drawY, // Position to draw sprite on the canvas.
-            this._width * this._scale, this._height * this._scale); // Size to draw sprite on canvas.
-        
-          var myImg = ctx.getImageData(0, 0, 100, 100);
-          //var myImg = ctx.getImageData(drawX, drawY, this._width * this._scale, this._height * this._scale);
-          for (var t=0; t < myImg.data.length; t+=4) {
-             myImg.data[t]=   this._color.r | myImg.data[t];
-             myImg.data[t+1]= this._color.g | myImg.data[t+1];
-             myImg.data[t+2]= this._color.b | myImg.data[t+2];
-          }
-          ctx.putImageData(myImg, 0, 0); // Image data is adjusted according to context    
+    // Draw image.
+    ctx.drawImage(this._spriteSheet,
+        cF.x * this._frameWidth, cF.y * this._frameHeight,  // Sprite's top-left position on sprite sheet.
+        this._frameWidth, this._frameHeight, // Size of source sprite.
+        drawX, drawY, // Position to draw sprite on the canvas.
+        this._width * this._scale, this._height * this._scale); // Size to draw sprite on canvas.
+    
+    var myImg = ctx.getImageData(drawX, drawY, 100, 100);
+    //var myImg = ctx.getImageData(drawX, drawY, this._width * this._scale, this._height * this._scale);
+    for (var t=0; t < myImg.data.length; t+=4) {
+       myImg.data[t]=   this._color.r | myImg.data[t];
+       myImg.data[t+1]= this._color.g | myImg.data[t+1];
+       myImg.data[t+2]= this._color.b | myImg.data[t+2];
+    }
+    ctx.putImageData(myImg, 0, 0); // Image data is adjusted according to context    
         
         
         // Update time.
