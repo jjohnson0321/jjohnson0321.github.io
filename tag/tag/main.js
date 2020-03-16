@@ -440,7 +440,7 @@ ASSET_MANAGER.downloadAll(function () {
     var fishy = null;
     //gameEngine.maxSize = 200;
     //gameEngine.maxRandomSize = 20;
-    for (var i = 0; i < 240; i++) {
+    for (var i = 0; i < 300; i++) {
         let randX = RandomBetween(0, 1600);
         let randY = RandomBetween(0, 800);
         let randDir = RandomBetween(-Math.PI, Math.PI); // 0 is right
