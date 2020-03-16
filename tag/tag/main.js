@@ -16,6 +16,8 @@ class Fishy
     //timers
     this.colorTimer = null;
     this.escapeTimer = null;
+    let that = this;
+    //this.changeDirTimer = new TimerCallback(this.game, RandomBetween(10, 30), true, function() {that.dir = RandomBetween(-Math.PI, Math.PI);});
   }
   
   screenWrap()
@@ -172,33 +174,7 @@ class Fishy
             }
             else if(this.radius > temp.radius * temp.similar)// bigger size
             {
-              let dir = normalizeV(dirV(A, temp)); // direction away from the bigger fish
-              dir = Math.atan2(dir.y, dir.x);
-              let dir2 = this.dir + Math.PI/2;
-              let dir3 = this.dir - Math.PI/2;
-              
-              if(Math.abs((dir + Math.PI) - (dir2 + Math.PI)) > Math.abs((dir + Math.PI) - (dir3 + Math.PI)) )
-              {
-                dir2 = dir3;
-              }
-              
-              dir = mix(dir, dir2, 0.6);
-              temp.dir = mix(temp.dir, dir, 0.2);
 
-              let that = temp;
-              if(temp.escapeTimer !== null)
-              {
-                temp.escapeTimer.destroy();
-                temp.escapeTimer.pause();
-              }
-              else
-              {
-                if(this.escaping === false)
-                {
-                  this.escaping = true;
-                }
-              }
-              temp.escapeTimer = new TimerCallback(temp.game, 1, false, function () {if(that.escaping === true) {that.escaping = false;} that.escapeTimer = null;});
             }
             else // similar size
             {
@@ -213,7 +189,7 @@ class Fishy
               }
               
               dir = mix(dir, dir2, 0.3);
-              this.dir = mix(this.dir, dir, 0.2);
+              this.dir = mix(this.dir, dir, 0.05);
             }
           }
         }
@@ -475,28 +451,28 @@ ASSET_MANAGER.downloadAll(function () {
         let distance = 10;
         let similar = 1.1;
         let randomPercent = RandomBetween(0, 100);
-        if(randomPercent < 23)
+        if(randomPercent < 37)
         {
           minSize = 1;
           maxSize = 3;
           distance = 25;
-          similar = 3;
+          similar = 2.5;
         }
-        if(randomPercent < 56)
+        if(randomPercent < 66)
         {
           minSize = 3;
           maxSize = 6;
           distance = 20;
-          similar = 2;
+          similar = 1.75;
         }
-        else if(randomPercent < 92)
+        else if(randomPercent < 94)
         {
           minSize = 7;
           maxSize = 12;
           distance = 15;
           similar = 1.5;
         }
-        else if(randomPercent < 97)
+        else if(randomPercent < 98)
         {
           minSize = 11;
           maxSize = 17;
@@ -517,4 +493,68 @@ ASSET_MANAGER.downloadAll(function () {
     }
     gameEngine.init(ctx);
     gameEngine.start();
+    
+  /*  
+    var socket = io.connect("http://localhost:8888");
+
+    window.onload = function () {
+        console.log("starting up da sheild");
+        var messages = [];
+        var field = document.getElementById("field");
+        var username = document.getElementById("username");
+
+        socket.on("ping", function (ping) {
+            console.log(ping);
+            socket.emit("pong");
+        });
+
+        socket.on('sync', function (data) {
+            console.log(data.length +" messages synced.");
+            messages = data;
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                html += '<b>' + (messages[i].username ? messages[i].username : 'Server') + ': </b>';
+                html += messages[i].message + '<br />';
+            }
+            content.innerHTML = html;
+            content.scrollTop = content.scrollHeight;
+        });
+
+        socket.on('message', function (data) {
+            if (data.message) {
+                messages.push(data);
+                // update html
+                var html = '';
+                for (var i = 0; i < messages.length; i++) {
+                    html += '<b>' + (messages[i].username ? messages[i].username : 'Server') + ': </b>';
+                    html += messages[i].message + '<br />';
+                }
+                content.innerHTML = html;
+                content.scrollTop = content.scrollHeight;
+            } else {
+                console.log("There is a problem:", data);
+            }
+        });
+
+        field.onkeydown = function (e) {
+            if (e.keyCode == 13) {
+                var text = field.value;
+                var name = username.value;
+                socket.emit('send', { message: text, username: name });
+                field.value = "";
+            }
+        };
+
+        socket.on("connect", function () {
+            console.log("Socket connected.")
+        });
+        socket.on("disconnect", function () {
+            console.log("Socket disconnected.")
+        });
+        socket.on("reconnect", function () {
+            console.log("Socket reconnected.")
+        });
+
+  };*/
+
 });
