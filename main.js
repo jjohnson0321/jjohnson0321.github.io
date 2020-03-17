@@ -438,9 +438,26 @@ ASSET_MANAGER.downloadAll(function () {
     var ctx = canvas.getContext('2d');
     var gameEngine = new GameEngine();
     var fishy = null;
+    
+
     //gameEngine.maxSize = 200;
     //gameEngine.maxRandomSize = 20;
+    
+    let saveObjects = [];
     for (var i = 0; i < 300; i++) {
+      
+        var saveObject = 
+        {
+          randX: 0,
+          randY: 0,
+          randDir: 0,
+          randSpeed: 0,
+          randRadius: 0,
+          randColor: 0,
+          distance: 0,
+          similar: 0
+        };
+      
         let randX = RandomBetween(0, 1600);
         let randY = RandomBetween(0, 800);
         let randDir = RandomBetween(-Math.PI, Math.PI); // 0 is right
@@ -451,110 +468,97 @@ ASSET_MANAGER.downloadAll(function () {
         let distance = 10;
         let similar = 1.1;
         let randomPercent = RandomBetween(0, 100);
-        if(randomPercent < 37)
+        if(randomPercent < 43)
         {
           minSize = 1;
           maxSize = 3;
           distance = 25;
           similar = 2.5;
         }
-        if(randomPercent < 66)
+        if(randomPercent < 70)
         {
           minSize = 3;
           maxSize = 6;
           distance = 20;
           similar = 1.75;
         }
+        else if(randomPercent < 84)
+        {
+          minSize = 5;
+          maxSize = 10;
+          distance = 15;
+          similar = 1.3;
+        }
         else if(randomPercent < 94)
         {
-          minSize = 7;
-          maxSize = 12;
-          distance = 15;
-          similar = 1.5;
+          minSize = 9;
+          maxSize = 15;
+          distance = 10;
+          similar = 1.2;
         }
         else if(randomPercent < 98)
         {
-          minSize = 11;
+          minSize = 13;
           maxSize = 17;
-          distance = 10;
-          similar = 1.2;
+          distance = 5;
+          similar = 1.1;
         }
         else if(randomPercent < 100)
         {
           minSize = 19;
-          maxSize = 27;
+          maxSize = 30;
           distance = 5;
           similar = 1.1;
         }
         let randRadius = RandomBetween(minSize, maxSize);
-        let randColor = new Color(300 - randRadius / 25 * 360, RandomBetween(90, 100), RandomBetween(47, 53));
+        let randColor = new Color(300 - randRadius / 30 * 360, RandomBetween(90, 100), RandomBetween(47, 53));
         fishy = new Fishy(gameEngine, randX, randY, randDir, randSpeed, randRadius, randColor, distance, similar);
+        saveObject.randX = randX;
+        saveObject.randY = randY;
+        saveObject.randDir = randDir;
+        saveObject.randSpeed = randSpeed;
+        saveObject.randRadius = randRadius;
+        saveObject.randColor = {h: randColor.h, s: randColor.s, l: randColor.l};
+        saveObject.distance = distance;
+        saveObject.similar = similar;
         gameEngine.addEntity(fishy);
+        
+        saveObjects.push(saveObject);
     }
     gameEngine.init(ctx);
     gameEngine.start();
     
-  /*  
-    var socket = io.connect("http://localhost:8888");
+    
+    
+    var socket = io.connect("http://24.16.255.56:8888");
+    var saveButton = document.getElementById("save");
+    var loadButton = document.getElementById("load");
+    
+    saveButton.onclick = function () {
+      socket.emit('save', {studentname: "Joel Johnson", statename: "Test1", savedData: {list: saveObjects}});
+    }
+    
+    loadButton.onclick = function ()
+    {
+      socket.emit('load', {studentname: "Joel Johnson", statename: "Test1"});
 
-    window.onload = function () {
-        console.log("starting up da sheild");
-        var messages = [];
-        var field = document.getElementById("field");
-        var username = document.getElementById("username");
+    }
 
-        socket.on("ping", function (ping) {
-            console.log(ping);
-            socket.emit("pong");
-        });
-
-        socket.on('sync', function (data) {
-            console.log(data.length +" messages synced.");
-            messages = data;
-            var html = '';
-            for (var i = 0; i < messages.length; i++) {
-                html += '<b>' + (messages[i].username ? messages[i].username : 'Server') + ': </b>';
-                html += messages[i].message + '<br />';
-            }
-            content.innerHTML = html;
-            content.scrollTop = content.scrollHeight;
-        });
-
-        socket.on('message', function (data) {
-            if (data.message) {
-                messages.push(data);
-                // update html
-                var html = '';
-                for (var i = 0; i < messages.length; i++) {
-                    html += '<b>' + (messages[i].username ? messages[i].username : 'Server') + ': </b>';
-                    html += messages[i].message + '<br />';
+    socket.on('load', function (data) {
+            if (data) {
+                console.log(data);
+                gameEngine.entities.length = 0;
+                
+                console.log(data.savedData.list);
+      
+                for (var i = 0; i < data.savedData.list.length; i++) {
+                  fishy = new Fishy(gameEngine, data.savedData.list[i].randX, data.savedData.list[i].randY, data.savedData.list[i].randDir, data.savedData.list[i].randSpeed, data.savedData.list[i].randRadius, new Color(data.savedData.list[i].randColor.h, data.savedData.list[i].randColor.s, data.savedData.list[i].randColor.l), data.savedData.list[i].distance, data.savedData.list[i].similar)
+                  gameEngine.addEntity(fishy);
                 }
-                content.innerHTML = html;
-                content.scrollTop = content.scrollHeight;
+        
             } else {
                 console.log("There is a problem:", data);
             }
         });
-
-        field.onkeydown = function (e) {
-            if (e.keyCode == 13) {
-                var text = field.value;
-                var name = username.value;
-                socket.emit('send', { message: text, username: name });
-                field.value = "";
-            }
-        };
-
-        socket.on("connect", function () {
-            console.log("Socket connected.")
-        });
-        socket.on("disconnect", function () {
-            console.log("Socket disconnected.")
-        });
-        socket.on("reconnect", function () {
-            console.log("Socket reconnected.")
-        });
-
-  };*/
 
 });
